@@ -4,6 +4,7 @@ package org.usfirst.frc.team2554.robot;
 
 import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -29,30 +30,41 @@ import edu.wpi.first.wpilibj.Spark;
  * this system. Use IterativeRobot or Command-Based instead if you're new.
  */
 public class Robot extends SampleRobot {
-    RobotDrive myRobot;
+    RobotDrive myRobot, shooter;
     /*
       PORT 0 MUST BE JOYSTICK
       PORT 1 MUST BE CONTROLLER
       CONTROLLER MUST BE SET TO X-INPUT
      */
     //Creation of two Joysticks. One right an actual joystick. The other is a controller. However both lies under the Joystick class.     
-    Joystick stick, controller;
+    Joystick joystick, controller;
     //Creation of 3 JoystickButtons which is used to receive data from buttons on a Joystick.
     JoystickButton shooterButton, rotationOffButton, autoAimButton;
     //Victors is used to move the arm bar and shooter bar up.
-    Victor armBar, shooter;
+    Victor armBar, barShooter;
     //Sparks are used to control the launcher and roller.
     Spark launcher, roller;
     //A DEADZONE is increase zone where the arm bar and shooter bar motors are off
     final double DEADZONE = 0.15;
-    //SenableChooser to put a list of choices onto SmartBoard
+    //A distance sensor connected through Analog Input
+    AnalogInput distanceSensor;
+    double distance = 0;
+    //SendableChooser to put a list of choices onto SmartBoard
     SendableChooser chooser;
 
     public Robot() {
-        myRobot = new RobotDrive();
+        myRobot = new RobotDrive(IO.robotDriveMotorPorts[3], IO.robotDriveMotorPorts[2], IO.robotDriveMotorPorts[1], IO.robotDriveMotorPorts[0]);
         myRobot.setExpiration(0.1);
-        stick = new Joystick(0);
-    }
+        joystick = new Joystick(IO.joystickPort);
+        controller = new Joystick(IO.controllerPort);
+        shooter = new RobotDrive(IO.shooterMotorPorts[0], IO.shooterMotorPorts[1]);
+        armBar = new Victor(IO.armMotorPorts[0]);
+        barShooter = new Victor(IO.armMotorPorts[1]);
+        launcher = new Spark(IO.launcherMotorPort);
+        roller = new Spark(IO.rollerMotorPort);
+        distanceSensor = new AnalogInput(IO.distanceSensorPortNumber);
+        
+   }
     
     public void robotInit() {
         chooser = new SendableChooser();
@@ -72,7 +84,7 @@ public class Robot extends SampleRobot {
 	 */
     public void autonomous() {
     	
-    	String autoSelected = (String) chooser.getSelected();
+    	/*String autoSelected = (String) chooser.getSelected();
 //		String autoSelected = SmartDashboard.getString("Auto Selector", defaultAuto);
 		System.out.println("Auto selected: " + autoSelected);
     	
@@ -90,7 +102,7 @@ public class Robot extends SampleRobot {
             Timer.delay(2.0);		//    for 2 seconds
             myRobot.drive(0.0, 0.0);	// stop robot
             break;
-    	}
+    	}*/
     }
 
     /**
@@ -99,7 +111,7 @@ public class Robot extends SampleRobot {
     public void operatorControl() {
         myRobot.setSafetyEnabled(true);
         while (isOperatorControl() && isEnabled()) {
-            myRobot.arcadeDrive(stick); // drive with arcade style (use right stick)
+            //myRobot.arcadeDrive(stick); // drive with arcade style (use right stick)
             Timer.delay(0.005);		// wait for a motor update time
         }
     }
