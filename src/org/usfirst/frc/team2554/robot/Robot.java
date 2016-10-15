@@ -38,6 +38,8 @@ public class Robot extends SampleRobot {
     DigitalInput limitSwitch;
     //SendableChooser to put a list of choices onto SmartBoard
     SendableChooser chooser;
+    //Magnitude
+    double magnitude = 0;
 
     public Robot() {
         myRobot = new RobotDrive(IO.robotDriveMotorPorts[3], IO.robotDriveMotorPorts[2], IO.robotDriveMotorPorts[1], IO.robotDriveMotorPorts[0]);
@@ -104,7 +106,12 @@ public class Robot extends SampleRobot {
     public void operatorControl() {
         myRobot.setSafetyEnabled(true);
         while (isOperatorControl() && isEnabled()) {
-        	//NEED TO ADD WHAT SAMARTH WANTS
+        	//Driving the robot
+        	magnitude = -joystick.getRawAxis(3) + 1;
+            if( !joystick.getRawButton(9) )
+        	    myRobot.arcadeDrive( magnitude * -joystick.getY(), magnitude * -joystick.getZ() );
+            else
+                myRobot.arcadeDrive( magnitude * -joystick.getY(), 0 ); //newly added line
         	//If the axis is really close to the center(aka the DEADZONE) the arm will provide an upwards torque to combat gravity.
             if(controller.getRawAxis(IO.armBarAxis) <= DEADZONE && controller.getRawAxis(IO.armBarAxis)>= -DEADZONE)
             	armBar.set(-0.08);
