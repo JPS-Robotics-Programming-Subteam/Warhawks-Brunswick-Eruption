@@ -5,6 +5,7 @@ package org.usfirst.frc.team2554.robot;
 import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -13,22 +14,6 @@ import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.Spark;
 
-/**
- * This is a demo program showing the use of the RobotDrive class.
- * The SampleRobot class is the base of a robot application that will automatically call your
- * Autonomous and OperatorControl methods at the right time as controlled by the switches on
- * the driver station or the field controls.
- *
- * The VM is configured to automatically run this class, and to call the
- * functions corresponding to each mode, as described in the SampleRobot
- * documentation. If you change the name of this class or the package after
- * creating this project, you must also update the manifest file in the resource
- * directory.
- *
- * WARNING: While it may look like a good choice to use for your code if you're inexperienced,
- * don't. Unless you know what you are doing, complex code will be much more difficult under
- * this system. Use IterativeRobot or Command-Based instead if you're new.
- */
 public class Robot extends SampleRobot {
     RobotDrive myRobot, shooter;
     /*
@@ -41,7 +26,7 @@ public class Robot extends SampleRobot {
     //Creation of 3 JoystickButtons which is used to receive data from buttons on a Joystick.
     JoystickButton shooterButton, rotationOffButton, autoAimButton;
     //Victors is used to move the arm bar and shooter bar up.
-    Victor armBar, barShooter;
+    Victor armBar, armShooter;
     //Sparks are used to control the launcher and roller.
     Spark launcher, roller;
     //A DEADZONE is increase zone where the arm bar and shooter bar motors are off
@@ -49,6 +34,8 @@ public class Robot extends SampleRobot {
     //A distance sensor connected through Analog Input
     AnalogInput distanceSensor;
     double distance = 0;
+    //A limit switch to stop the arm from going too far
+    DigitalInput limitSwitch;
     //SendableChooser to put a list of choices onto SmartBoard
     SendableChooser chooser;
 
@@ -59,17 +46,20 @@ public class Robot extends SampleRobot {
         controller = new Joystick(IO.controllerPort);
         shooter = new RobotDrive(IO.shooterMotorPorts[0], IO.shooterMotorPorts[1]);
         armBar = new Victor(IO.armMotorPorts[0]);
-        barShooter = new Victor(IO.armMotorPorts[1]);
+        armShooter = new Victor(IO.armMotorPorts[1]);
         launcher = new Spark(IO.launcherMotorPort);
         roller = new Spark(IO.rollerMotorPort);
         distanceSensor = new AnalogInput(IO.distanceSensorPortNumber);
-        
+        limitSwitch = new DigitalInput(IO.limitSwitchPort);
    }
     
     public void robotInit() {
         chooser = new SendableChooser();
-        chooser.addDefault("Default Auto", 0);
-        chooser.addObject("My Auto", 1);
+        chooser.addDefault("Do Nothing(Default)", 'n');
+        chooser.addObject("Under Low Bar", 'l');
+        chooser.addObject("Rough Terrain", 'r');
+        chooser.addObject("Portcullis", 'p');
+        chooser.addObject("High Wall", 'w');
         SmartDashboard.putData("Auto modes", chooser);
     }
 
@@ -84,25 +74,28 @@ public class Robot extends SampleRobot {
 	 */
     public void autonomous() {
     	
-    	/*String autoSelected = (String) chooser.getSelected();
-//		String autoSelected = SmartDashboard.getString("Auto Selector", defaultAuto);
+    	String autoSelected = (String) chooser.getSelected();
 		System.out.println("Auto selected: " + autoSelected);
     	
     	switch(autoSelected) {
-    	case customAuto:
-            myRobot.setSafetyEnabled(false);
-            myRobot.drive(-0.5, 1.0);	// spin at half speed
-            Timer.delay(2.0);		//    for 2 seconds
-            myRobot.drive(0.0, 0.0);	// stop robot
-            break;
-    	case defaultAuto:
-    	default:
-            myRobot.setSafetyEnabled(false);
-            myRobot.drive(-0.5, 0.0);	// drive forwards half speed
-            Timer.delay(2.0);		//    for 2 seconds
-            myRobot.drive(0.0, 0.0);	// stop robot
-            break;
-    	}*/
+    		case "Under Low Bar":
+    			AutoMethod.lowBar();
+    			break;
+    		case "Rough Terrain":
+    			AutoMethod.roughTerrain();
+    		case "Portcullis":
+    			AutoMethod.portcullis();
+    		case "High Wall":
+    			AutoMethod.highWall();
+    		default:
+    			//Needs more code
+    			myRobot.arcadeDrive(0,0);
+    			roller.set(0);
+    			shooter.arcadeDrive(0,0);
+    			break;
+    			
+    			
+    	}
     }
 
     /**
@@ -111,8 +104,45 @@ public class Robot extends SampleRobot {
     public void operatorControl() {
         myRobot.setSafetyEnabled(true);
         while (isOperatorControl() && isEnabled()) {
-            //myRobot.arcadeDrive(stick); // drive with arcade style (use right stick)
-            Timer.delay(0.005);		// wait for a motor update time
+        	//NEED TO ADD WHAT SAMARTH WANTS
+        	//If the axis is really close to the center(aka the DEADZONE) the arm will provide an upwards torque to combat gravity.
+            if(controller.getRawAxis(IO.armBarAxis) <= DEADZONE && controller.getRawAxis(IO.armBarAxis)>= -DEADZONE)
+            	armBar.set(-0.08);
+            //If the axis is not in the DEADZONE, it will function normally but with a multiplier to the magnitude.
+            else
+            	armBar.set(controller.getRawAxis(IO.armBarAxis)/3.0);
+            //Same logic as the other arm except the shooter arm is tight enough that it does not need an upwards torque to hold it up.
+            if(controller.getRawAxis(IO.armShooterAxis) <= DEADZONE && controller.getRawAxis(IO.armShooterAxis) >= -DEADZONE)
+            	armShooter.set(0);
+            else
+            	armShooter.set(-controller.getRawAxis(IO.armShooterAxis));
+            //The shooter system is set up as an arcade drive.
+            //The shooter will only shoot if the trigger is past a certain point so it doesn't accidentally trigger.
+            //Will only work if the other trigger is not down.
+            if(controller.getRawAxis(IO.shooterOutAxis) > 0.1 && controller.getRawAxis(IO.shooterInAxis) < 0.1)
+            	shooter.arcadeDrive(0, -controller.getRawAxis(IO.shooterOutAxis));
+            //The same concept as the out-going shooter but with less inwards spin speed.
+            //When intaking, the robot's rollers will also spin.
+            if(controller.getRawAxis(IO.shooterInAxis) > 0.1 && controller.getRawAxis(IO.shooterOutAxis) < 0.1){
+            	shooter.arcadeDrive(0,(controller.getRawAxis(IO.shooterInAxis)/3.0*2));
+            	roller.set(0.4);
+            }
+            //If both triggers are down or no triggers are down then nothing will happen.
+            else{
+            	roller.set(0.0);
+            	shooter.arcadeDrive(0,0);
+            }
+            //When the Y button has been pressed, the actuator on top of the robot will push the ball to the shooter
+            //The launcher has an auto-stop mechanism.
+            if(controller.getRawButton(IO.launchButtonNumber))
+            	//There is a multiplier to make sure the actuator doesn't move too fast.
+            	launcher.set(-1/2.00);
+            else
+            	//When ever the launcher is not used. It will always try to retract.
+            	launcher.set(1/2.00);
+            //Gets the distance from the sensor. getVoltage() is very volatile. Might want to change to getAverageVoltage().
+            distance = distanceSensor.getVoltage();
+        	Timer.delay(0.005);		// wait for a motor update time
         }
     }
 

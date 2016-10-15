@@ -22,7 +22,7 @@ public class IO {
 	final public static int armBarAxis = 1;
 	final public static int shooterInAxis = 2;
 	final public static int shooterOutAxis = 3;
-	final public static int shooterBarAxis = 5;
+	final public static int armShooterAxis = 5;
 	/*
 	 Mapping of the motors used to drive the robot
 	 The order is BackRight, FrontRight, BackLeft, Front Left
@@ -43,4 +43,6 @@ public class IO {
 	final public static int rollerMotorPort = 9;
 	//Mapping for the distance sensor(Analog Input)
 	final public static int distanceSensorPortNumber = 0;
+	//Mapping for the limit switch
+	final public static int limitSwitchPort = 9;
 }
