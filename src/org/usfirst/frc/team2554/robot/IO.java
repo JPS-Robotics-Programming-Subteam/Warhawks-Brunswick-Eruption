@@ -10,8 +10,9 @@ public class IO {
 	 5 is X Button?
 	 */
 	final public static int rotationOffButtonNumber = 0;
+	final public static int autoAimButtonNumber = 1;
 	final public static int launchButtonNumber = 4;
-	final public static int autoAimButtonNumber = 5;
+	final public static int noTurnButtonNumber = 9;
 	//Mapping of the Axis on the Joystick
 	/*
 	 1 is the L Y Axis

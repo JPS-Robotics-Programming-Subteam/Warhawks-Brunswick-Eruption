@@ -108,10 +108,12 @@ public class Robot extends SampleRobot {
         while (isOperatorControl() && isEnabled()) {
         	//Driving the robot
         	magnitude = -joystick.getRawAxis(3) + 1;
-            if( !joystick.getRawButton(9) )
+        	//If the button is not pressed down then the robot will move normally
+            if( !joystick.getRawButton(IO.noTurnButtonNumber) )
         	    myRobot.arcadeDrive( magnitude * -joystick.getY(), magnitude * -joystick.getZ() );
+            //If the button is pressed, the button will no longer turn.
             else
-                myRobot.arcadeDrive( magnitude * -joystick.getY(), 0 ); //newly added line
+                myRobot.arcadeDrive( magnitude * -joystick.getY(), 0 );
         	//If the axis is really close to the center(aka the DEADZONE) the arm will provide an upwards torque to combat gravity.
             if(controller.getRawAxis(IO.armBarAxis) <= DEADZONE && controller.getRawAxis(IO.armBarAxis)>= -DEADZONE)
             	armBar.set(-0.08);
@@ -149,6 +151,9 @@ public class Robot extends SampleRobot {
             	launcher.set(1/2.00);
             //Gets the distance from the sensor. getVoltage() is very volatile. Might want to change to getAverageVoltage().
             distance = distanceSensor.getVoltage();
+            //If A is pressed then then the AutoAim sequence will run
+            if(controller.getRawButton(IO.autoAimButtonNumber))
+            	AutoAim.run(myRobot, armShooter,shooter,launcher, limitSwitch);
         	Timer.delay(0.005);		// wait for a motor update time
         }
     }
