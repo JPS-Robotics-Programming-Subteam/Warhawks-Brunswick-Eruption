@@ -79,7 +79,7 @@ public class Robot extends SampleRobot {
     	String autoSelected = (String) chooser.getSelected();
 		System.out.println("Auto selected: " + autoSelected);
     	
-    	switch(autoSelected) {
+/*    	switch(autoSelected) {
     		case "Under Low Bar":
     			AutoMethod.lowBar();
     			break;
@@ -94,10 +94,10 @@ public class Robot extends SampleRobot {
     			myRobot.arcadeDrive(0,0);
     			roller.set(0);
     			shooter.arcadeDrive(0,0);
-    			break;
-    			
+    			break;	
     			
     	}
+ */
     }
 
     /**
@@ -116,12 +116,14 @@ public class Robot extends SampleRobot {
                 myRobot.arcadeDrive( magnitude * -joystick.getY(), 0 );
         	//If the axis is really close to the center(aka the DEADZONE) the arm will provide an upwards torque to combat gravity.
             if(controller.getRawAxis(IO.armBarAxis) <= DEADZONE && controller.getRawAxis(IO.armBarAxis)>= -DEADZONE)
-            	armBar.set(-0.08);
+            	armBar.set(-0.05);
             //If the axis is not in the DEADZONE, it will function normally but with a multiplier to the magnitude.
             else
             	armBar.set(controller.getRawAxis(IO.armBarAxis)/3.0);
             //Same logic as the other arm except the shooter arm is tight enough that it does not need an upwards torque to hold it up.
             if(controller.getRawAxis(IO.armShooterAxis) <= DEADZONE && controller.getRawAxis(IO.armShooterAxis) >= -DEADZONE)
+            	armShooter.set(0);
+            else if(!limitSwitch.get() && controller.getRawAxis(IO.armShooterAxis) > 0)
             	armShooter.set(0);
             else
             	armShooter.set(-controller.getRawAxis(IO.armShooterAxis));
@@ -145,15 +147,23 @@ public class Robot extends SampleRobot {
             //The launcher has an auto-stop mechanism.
             if(controller.getRawButton(IO.launchButtonNumber))
             	//There is a multiplier to make sure the actuator doesn't move too fast.
-            	launcher.set(-1/2.00);
+            	launcher.set(1/2.00);
             else
             	//When ever the launcher is not used. It will always try to retract.
-            	launcher.set(1/2.00);
+            	launcher.set(-1/2.00);
             //Gets the distance from the sensor. getVoltage() is very volatile. Might want to change to getAverageVoltage().
             distance = distanceSensor.getVoltage();
             //If A is pressed then then the AutoAim sequence will run
-            if(controller.getRawButton(IO.autoAimButtonNumber))
+/*            if(controller.getRawButton(IO.autoAimButtonNumber))
             	AutoAim.run(myRobot, armShooter,shooter,launcher, limitSwitch);
+ */
+            //If Left button is pressed, then the robot will slightly turn left (used for aiming)
+            if(controller.getRawButton(5))
+            	myRobot.arcadeDrive(0, 0.1);
+            //If Right button is pressed, then the robot will slightly turn right (used for aiming)
+            if(controller.getRawButton(6))
+            	myRobot.arcadeDrive(0, -0.1);
+            
         	Timer.delay(0.005);		// wait for a motor update time
         }
     }

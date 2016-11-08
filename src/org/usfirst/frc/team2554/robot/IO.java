@@ -12,6 +12,8 @@ public class IO {
 	final public static int rotationOffButtonNumber = 0;
 	final public static int autoAimButtonNumber = 1;
 	final public static int launchButtonNumber = 4;
+	final public static int rotateLeft = 5;
+	final public static int rotateRight = 6; 
 	final public static int noTurnButtonNumber = 9;
 	//Mapping of the Axis on the Joystick
 	/*
