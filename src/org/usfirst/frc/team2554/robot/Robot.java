@@ -2,6 +2,7 @@
 package org.usfirst.frc.team2554.robot;
 
 
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.AnalogInput;
@@ -39,9 +40,14 @@ public class Robot extends SampleRobot {
     //SendableChooser to put a list of choices onto SmartBoard
     SendableChooser chooser;
     //Magnitude
-    double magnitude = 0;
+    double magnitude = 0.0;
+    double turningMagnitude = 0.0;
+    CameraServer server;
 
     public Robot() {
+    	server = CameraServer.getInstance();
+        server.setQuality(50);
+        server.startAutomaticCapture("cam0");
         myRobot = new RobotDrive(IO.robotDriveMotorPorts[3], IO.robotDriveMotorPorts[2], IO.robotDriveMotorPorts[1], IO.robotDriveMotorPorts[0]);
         myRobot.setExpiration(0.1);
         joystick = new Joystick(IO.joystickPort);
@@ -76,7 +82,6 @@ public class Robot extends SampleRobot {
 	 */
     public void autonomous() {
     	
-<<<<<<< Updated upstream
     	String autoSelected = (String) chooser.getSelected();
 		System.out.println("Auto selected: " + autoSelected);
     	
@@ -114,12 +119,21 @@ public class Robot extends SampleRobot {
         while (isOperatorControl() && isEnabled()) {
         	//Driving the robot
         	magnitude = -joystick.getRawAxis(3) + 1;
-        	//If the button is not pressed down then the robot will move normally
+            if( joystick.getRawButton( IO.slowTurnButtonNumber ) ) {
+                turningMagnitude = -joystick.getRawAxis(3) * 0.5 + 1; //you might wanna change the 0.5 to something else
+            }
+            turningMagnitude = -joystick.getRawAxis(3) + 1;
+
+
+            //If the button is not pressed down then the robot will move normally
             if( !joystick.getRawButton(IO.noTurnButtonNumber) )
-        	    myRobot.arcadeDrive( magnitude * -joystick.getY(), magnitude * -joystick.getZ() );
+        	    myRobot.arcadeDrive( magnitude * -joystick.getY(), turningMagnitude * -joystick.getZ() );
             //If the button is pressed, the button will no longer turn.
             else
                 myRobot.arcadeDrive( magnitude * -joystick.getY(), 0 );
+
+
+
         	//If the axis is really close to the center(aka the DEADZONE) the arm will provide an upwards torque to combat gravity.
             if(controller.getRawAxis(IO.armBarAxis) <= DEADZONE && controller.getRawAxis(IO.armBarAxis)>= -DEADZONE)
             	armBar.set(-0.05);
@@ -137,11 +151,11 @@ public class Robot extends SampleRobot {
             //The shooter will only shoot if the trigger is past a certain point so it doesn't accidentally trigger.
             //Will only work if the other trigger is not down.
             if(controller.getRawAxis(IO.shooterOutAxis) > 0.1 && controller.getRawAxis(IO.shooterInAxis) < 0.1)
-            	shooter.arcadeDrive(0, -controller.getRawAxis(IO.shooterOutAxis));
+            	shooter.arcadeDrive(0, controller.getRawAxis(IO.shooterOutAxis));
             //The same concept as the out-going shooter but with less inwards spin speed.
             //When intaking, the robot's rollers will also spin.
-            if(controller.getRawAxis(IO.shooterInAxis) > 0.1 && controller.getRawAxis(IO.shooterOutAxis) < 0.1){
-            	shooter.arcadeDrive(0,(controller.getRawAxis(IO.shooterInAxis)/3.0*2));
+            else if(controller.getRawAxis(IO.shooterInAxis) > 0.1 && controller.getRawAxis(IO.shooterOutAxis) < 0.1){
+            	shooter.arcadeDrive(0,(-controller.getRawAxis(IO.shooterInAxis)/3.0*2));
             	roller.set(0.4);
             }
             //If both triggers are down or no triggers are down then nothing will happen.
@@ -163,16 +177,12 @@ public class Robot extends SampleRobot {
 /*            if(controller.getRawButton(IO.autoAimButtonNumber))
             	AutoAim.run(myRobot, armShooter,shooter,launcher, limitSwitch);
  */
-<<<<<<< Updated upstream
             //If Left button is pressed, then the robot will slightly turn left (used for aiming)
             if(controller.getRawButton(5))
             	myRobot.arcadeDrive(0, 0.1);
             //If Right button is pressed, then the robot will slightly turn right (used for aiming)
             if(controller.getRawButton(6))
             	myRobot.arcadeDrive(0, -0.1);
-            
-=======
->>>>>>> Stashed changes
         	Timer.delay(0.005);		// wait for a motor update time
         }
     }
