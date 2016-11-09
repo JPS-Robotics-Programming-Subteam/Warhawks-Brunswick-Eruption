@@ -76,18 +76,24 @@ public class Robot extends SampleRobot {
 	 */
     public void autonomous() {
     	
+<<<<<<< Updated upstream
     	String autoSelected = (String) chooser.getSelected();
 		System.out.println("Auto selected: " + autoSelected);
     	
 /*    	switch(autoSelected) {
     		case "Under Low Bar":
+=======
+    	char autoSelected = (char) chooser.getSelected();
+    	switch(autoSelected) {
+    		case 'l':
+>>>>>>> Stashed changes
     			AutoMethod.lowBar();
     			break;
-    		case "Rough Terrain":
+    		case 'r':
     			AutoMethod.roughTerrain();
-    		case "Portcullis":
+    		case 'p':
     			AutoMethod.portcullis();
-    		case "High Wall":
+    		case 'w':
     			AutoMethod.highWall();
     		default:
     			//Needs more code
@@ -157,6 +163,7 @@ public class Robot extends SampleRobot {
 /*            if(controller.getRawButton(IO.autoAimButtonNumber))
             	AutoAim.run(myRobot, armShooter,shooter,launcher, limitSwitch);
  */
+<<<<<<< Updated upstream
             //If Left button is pressed, then the robot will slightly turn left (used for aiming)
             if(controller.getRawButton(5))
             	myRobot.arcadeDrive(0, 0.1);
@@ -164,6 +171,8 @@ public class Robot extends SampleRobot {
             if(controller.getRawButton(6))
             	myRobot.arcadeDrive(0, -0.1);
             
+=======
+>>>>>>> Stashed changes
         	Timer.delay(0.005);		// wait for a motor update time
         }
     }
