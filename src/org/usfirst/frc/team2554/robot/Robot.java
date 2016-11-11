@@ -81,7 +81,7 @@ public class Robot extends SampleRobot {
 	 * If using the SendableChooser make sure to add them to the chooser code above as well.
 	 */
     public void autonomous() {
-    	
+
     	String autoSelected = (String) chooser.getSelected();
 		System.out.println("Auto selected: " + autoSelected);
     	
@@ -132,8 +132,6 @@ public class Robot extends SampleRobot {
             else
                 myRobot.arcadeDrive( magnitude * -joystick.getY(), 0 );
 
-
-
         	//If the axis is really close to the center(aka the DEADZONE) the arm will provide an upwards torque to combat gravity.
             if(controller.getRawAxis(IO.armBarAxis) <= DEADZONE && controller.getRawAxis(IO.armBarAxis)>= -DEADZONE)
             	armBar.set(-0.05);
@@ -183,6 +181,7 @@ public class Robot extends SampleRobot {
             //If Right button is pressed, then the robot will slightly turn right (used for aiming)
             if(controller.getRawButton(6))
             	myRobot.arcadeDrive(0, -0.1);
+
         	Timer.delay(0.005);		// wait for a motor update time
         }
     }
