@@ -16,7 +16,7 @@ public class IO {
 	final public static int rotateRight = 6; 
 	final public static int noTurnButtonNumber = 9; //this is the trigger
 	final public static int slowTurnButtonNumber = 2;
-	//Mapping of the Axis on the Joystick
+	//Mapping of the Axes on the Joystick/Controller
 	/*
 	 1 is the L Y Axis
 	 2 is L Trigger

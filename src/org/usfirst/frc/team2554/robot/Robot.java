@@ -43,6 +43,9 @@ public class Robot extends SampleRobot {
     double magnitude = 0.0;
     double turningMagnitude = 0.0;
     CameraServer server;
+    //Speeds
+    final double slowTurnSpeed = 0.8; //speed which the robot turns at when a bumper is held
+    final double slowTurnMultiplier = 0.5; //multiplier that affects speed of slow turn with slow turn button;
 
     public Robot() {
     	server = CameraServer.getInstance();
@@ -81,7 +84,7 @@ public class Robot extends SampleRobot {
 	 * If using the SendableChooser make sure to add them to the chooser code above as well.
 	 */
     public void autonomous() {
-    	
+
     	String autoSelected = (String) chooser.getSelected();
 		System.out.println("Auto selected: " + autoSelected);
     	
@@ -120,7 +123,7 @@ public class Robot extends SampleRobot {
         	//Driving the robot
         	magnitude = -joystick.getRawAxis(3) + 1;
             if( joystick.getRawButton( IO.slowTurnButtonNumber ) ) {
-                turningMagnitude = -joystick.getRawAxis(3) * 0.5 + 1; //you might wanna change the 0.5 to something else
+                turningMagnitude = -joystick.getRawAxis(3) * slowTurnMultiplier + 1; //you might wanna change the 0.5 to something else
             }
             turningMagnitude = -joystick.getRawAxis(3) + 1;
 
@@ -132,7 +135,10 @@ public class Robot extends SampleRobot {
             else
                 myRobot.arcadeDrive( magnitude * -joystick.getY(), 0 );
 
-
+            if( controller.getRawButton(IO.rotateLeft) && !controller.getRawButton(IO.rotateRight) )
+                myRobot.arcadeDrive( magnitude * -joystick.getY(), slowTurnSpeed );
+            if( controller.getRawButton(IO.rotateRight) && !controller.getRawButton(IO.rotateLeft) )
+                myRobot.arcadeDrive( magnitude * -joystick.getY(), -slowTurnSpeed );
 
         	//If the axis is really close to the center(aka the DEADZONE) the arm will provide an upwards torque to combat gravity.
             if(controller.getRawAxis(IO.armBarAxis) <= DEADZONE && controller.getRawAxis(IO.armBarAxis)>= -DEADZONE)
@@ -183,6 +189,7 @@ public class Robot extends SampleRobot {
             //If Right button is pressed, then the robot will slightly turn right (used for aiming)
             if(controller.getRawButton(6))
             	myRobot.arcadeDrive(0, -0.1);
+
         	Timer.delay(0.005);		// wait for a motor update time
         }
     }
