@@ -3,3 +3,5 @@ Off-season Brunswick Eruption Code
 
 # TODO
 idk if anything should even go here rn
+
+richard branch is garbage
