@@ -118,7 +118,7 @@ public class Robot extends SampleRobot {
      * Runs the motors with arcade steering.
      */
     public void operatorControl() {
-        myRobot.setSafetyEnabled(true);
+/*        myRobot.setSafetyEnabled(true);
         while (isOperatorControl() && isEnabled()) {
         	//Driving the robot
         	magnitude = -joystick.getRawAxis(3) + 1;
@@ -180,9 +180,9 @@ public class Robot extends SampleRobot {
             //Gets the distance from the sensor. getVoltage() is very volatile. Might want to change to getAverageVoltage().
             distance = distanceSensor.getVoltage();
             //If A is pressed then then the AutoAim sequence will run
-/*            if(controller.getRawButton(IO.autoAimButtonNumber))
-            	AutoAim.run(myRobot, armShooter,shooter,launcher, limitSwitch);
- */
+//           if(controller.getRawButton(IO.autoAimButtonNumber))
+//            	AutoAim.run(myRobot, armShooter,shooter,launcher, limitSwitch);
+//
             //If Left button is pressed, then the robot will slightly turn left (used for aiming)
             if(controller.getRawButton(5))
             	myRobot.arcadeDrive(0, 0.1);
@@ -192,6 +192,7 @@ public class Robot extends SampleRobot {
 
         	Timer.delay(0.005);		// wait for a motor update time
         }
+ */
     }
 
     /**
